@@ -15,6 +15,7 @@
 		4B6EB1DB1F53B0D4005BADFE /* DVActionSheetDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6EB1DA1F53B0D4005BADFE /* DVActionSheetDemoTests.swift */; };
 		4B6EB1E61F53B0D4005BADFE /* DVActionSheetDemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6EB1E51F53B0D4005BADFE /* DVActionSheetDemoUITests.swift */; };
 		4B6EB1F41F53B133005BADFE /* DVActionSheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6EB1F31F53B133005BADFE /* DVActionSheetVC.swift */; };
+		4B6EB1F91F53F5FC005BADFE /* IMG_1625.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 4B6EB1F81F53F5FC005BADFE /* IMG_1625.PNG */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +50,7 @@
 		4B6EB1E51F53B0D4005BADFE /* DVActionSheetDemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DVActionSheetDemoUITests.swift; sourceTree = "<group>"; };
 		4B6EB1E71F53B0D4005BADFE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B6EB1F31F53B133005BADFE /* DVActionSheetVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DVActionSheetVC.swift; sourceTree = "<group>"; };
+		4B6EB1F81F53F5FC005BADFE /* IMG_1625.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = IMG_1625.PNG; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +108,7 @@
 				4B6EB1CC1F53B0D4005BADFE /* Assets.xcassets */,
 				4B6EB1CE1F53B0D4005BADFE /* LaunchScreen.storyboard */,
 				4B6EB1D11F53B0D4005BADFE /* Info.plist */,
+				4B6EB1F71F53F5FC005BADFE /* ScreenShots */,
 			);
 			path = DVActionSheetDemo;
 			sourceTree = "<group>";
@@ -126,6 +129,14 @@
 				4B6EB1E71F53B0D4005BADFE /* Info.plist */,
 			);
 			path = DVActionSheetDemoUITests;
+			sourceTree = "<group>";
+		};
+		4B6EB1F71F53F5FC005BADFE /* ScreenShots */ = {
+			isa = PBXGroup;
+			children = (
+				4B6EB1F81F53F5FC005BADFE /* IMG_1625.PNG */,
+			);
+			path = ScreenShots;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -239,6 +250,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B6EB1D01F53B0D4005BADFE /* LaunchScreen.storyboard in Resources */,
+				4B6EB1F91F53F5FC005BADFE /* IMG_1625.PNG in Resources */,
 				4B6EB1CD1F53B0D4005BADFE /* Assets.xcassets in Resources */,
 				4B6EB1CB1F53B0D4005BADFE /* Main.storyboard in Resources */,
 			);
@@ -421,6 +433,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = W44VGDHSN2;
 				INFOPLIST_FILE = DVActionSheetDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.amall360.amalltest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -436,6 +449,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = DVActionSheetDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.amall360.amalltest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
