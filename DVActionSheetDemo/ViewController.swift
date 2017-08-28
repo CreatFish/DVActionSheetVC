@@ -23,7 +23,11 @@ class ViewController: UIViewController {
 
     @IBAction func showActionSheet(_ sender: UIButton) {
         let vc = DVActionSheetVC()
-        vc.delegate = self
+//        vc.delegate = self
+        // 你可以通过block或者代理，来获取用户点击的选项.
+        vc.finishSelect = { (index) in
+            print("选中了第\(index)个选项")
+        }
         vc.moreButtonTitles = ["测试","测试","测试"]
         self.present(vc, animated: true, completion: nil)
     }

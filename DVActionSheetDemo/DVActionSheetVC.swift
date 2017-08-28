@@ -35,6 +35,12 @@ class DVActionSheetVC: UIViewController {
         
         return table
     }()
+    /*!
+     完成回调
+     
+     @discussion 可使用代理或者block，若实现了block将不会执行代理
+     */
+    var finishSelect: ((UInt32)->Void)?
     
     /// 取消按钮的title，默认为取消
     var cancelButtonTitle: String? = "取消" {
@@ -128,8 +134,12 @@ extension DVActionSheetVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        self.dismiss(animated: true) { 
-            self.delegate?.dvActionSheetVC(self, clickedButtonAt: indexPath.row)
+        self.dismiss(animated: true) {
+            if self.finishSelect != nil {
+                self.finishSelect?(UInt32(indexPath.row))
+            } else {
+                self.delegate?.dvActionSheetVC(self, clickedButtonAt: indexPath.row)
+            }
         }
     }
 }
