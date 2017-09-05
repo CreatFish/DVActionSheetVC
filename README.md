@@ -17,5 +17,10 @@
     
   }     
   vc.moreButtonTitles = ["测试","测试","测试"]    
-  self.present(vc, animated: true, completion: nil)
-        
+  self.present(vc, animated: true, completion: nil)    
+
+## 三. Requirements 要求    
+  iOS8及以上系统可使用. ARC环境.    
+  
+## 四. More 更多   
+  如果你发现了bug，请与我联系，邮箱: 654070281@qq.com
