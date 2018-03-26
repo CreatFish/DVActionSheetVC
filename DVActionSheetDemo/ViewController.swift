@@ -28,7 +28,10 @@ class ViewController: UIViewController {
         vc.finishSelect = { (index) in
             print("选中了第\(index)个选项")
         }
-        vc.moreButtonTitles = ["测试","测试","测试"]
+        vc.headerTitle = "是否退出登录?"
+        vc.footerTitle = "取消"
+        vc.cellTitleColor = UIColor.red
+        vc.moreButtonTitles = ["退出登录"]
         self.present(vc, animated: true, completion: nil)
     }
 

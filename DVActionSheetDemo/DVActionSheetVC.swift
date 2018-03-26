@@ -17,24 +17,26 @@ let kActionSheetBGColor = UIColor(red: 231/255.0, green: 231/255.0, blue: 231/25
 //  字体颜色
 let kActionSheetTextColor = UIColor(red: 51/255.0, green: 51/255.0, blue: 51/255.0, alpha: 1)
 //  actionBtn高度
-let kActionSheetBtnHeight: CGFloat = 55
+let kActionSheetCellHeight: CGFloat = 55
 
 class DVActionSheetVC: UIViewController {
 
     var delegate: DVActionSheetVCDelegate?
     lazy var actionSheet: UITableView! = {
         let table = UITableView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
-        
         self.view.addSubview(table)
         table.showsVerticalScrollIndicator = false
         table.backgroundColor = kActionSheetBGColor
         table.delegate = self
         table.dataSource = self
+        table.bounces = false
         table.separatorStyle = UITableViewCellSeparatorStyle.none
-        table.isScrollEnabled = false
-        
+        table.register(DVActionCell.classForCoder(), forCellReuseIdentifier: "DVActionCell")
+        table.register(DVActionFooter.classForCoder(), forHeaderFooterViewReuseIdentifier: "DVActionFooter")
+        table.register(DVActionHeader.classForCoder(), forHeaderFooterViewReuseIdentifier: "DVActionHeader")
         return table
     }()
+    
     /*!
      完成回调
      
@@ -42,20 +44,37 @@ class DVActionSheetVC: UIViewController {
      */
     var finishSelect: ((UInt32)->Void)?
     
-    /// 取消按钮的title，默认为取消
-    var cancelButtonTitle: String? = "取消" {
+    var headerTitleColor: UIColor = UIColor.lightGray {
         didSet {
-            actionSheet.reloadData()
+            reloadActionSheet()
         }
     }
-    
+    var cellTitleColor: UIColor = kActionSheetTextColor {
+        didSet {
+            reloadActionSheet()
+        }
+    }
+    var footerTitleColor: UIColor = kActionSheetTextColor {
+        didSet {
+            reloadActionSheet()
+        }
+    }
+    /// 取消按钮的title，默认为取消
+    var footerTitle: String? {
+        didSet {
+            reloadActionSheet()
+        }
+    }
+    /// 标题按钮的title
+    var headerTitle: String? {
+        didSet {
+            reloadActionSheet()
+        }
+    }
     /// actionSheet的标题集合
     var moreButtonTitles: [String] = [] {
         didSet {
-            actionSheet.reloadData()
-            actionSheet.layoutIfNeeded()
-            actionSheet.bounds = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: actionSheet.contentSize.height)
-            actionSheet.center = CGPoint(x: UIScreen.main.bounds.width*0.5, y: UIScreen.main.bounds.height-actionSheet.bounds.height*0.5)
+            reloadActionSheet()
         }
     }
     
@@ -73,16 +92,34 @@ class DVActionSheetVC: UIViewController {
     
     func setView() {
         self.view.backgroundColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 0/255.0, alpha: 0.6)
-        
         self.modalPresentationStyle = UIModalPresentationStyle.custom
         self.transitioningDelegate = self
+    }
+    
+    /*!
+     计算actionSheet高度
+     
+     @discussion 大于屏幕高度减去状态栏高度时让table高度等于屏幕高度
+     */
+    func reloadActionSheet() {
+        var height: CGFloat = 0
+        height = height + (headerTitle != nil ? kActionSheetCellHeight : 0)
+        height = height + (footerTitle != nil ? kActionSheetCellHeight + 3 : 0)
+        height = height + kActionSheetCellHeight*CGFloat(moreButtonTitles.count)
+        let maxHeight: CGFloat = (UIScreen.main.bounds.height == 812) ? (UIScreen.main.bounds.height - 44) : (UIScreen.main.bounds.height - 20)
+        if height > maxHeight {
+            height = maxHeight
+        }
+        actionSheet.bounds = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: height)
+        actionSheet.center = CGPoint(x: UIScreen.main.bounds.width*0.5, y: UIScreen.main.bounds.height-actionSheet.bounds.height*0.5)
+        actionSheet.reloadData()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.dismiss(animated: true, completion: nil)
     }
     
-    func hide() {
+    @objc private func hide() {
         self.dismiss(animated: true, completion: nil)
     }
 
@@ -97,40 +134,44 @@ extension DVActionSheetVC: UITableViewDelegate, UITableViewDataSource {
         return moreButtonTitles.count
     }
     
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return headerTitle != nil ? kActionSheetCellHeight : 0
+    }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return kActionSheetBtnHeight
+        return kActionSheetCellHeight
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return kActionSheetBtnHeight + 3
+        return footerTitle != nil ? (kActionSheetCellHeight + 3) : 0
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0.001
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if headerTitle != nil {
+            let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "DVActionHeader") as! DVActionHeader
+            header.titleColor = headerTitleColor
+            header.title = headerTitle
+            return header
+        }
+        return nil
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        var footer = tableView.dequeueReusableHeaderFooterView(withIdentifier: "DVActionFooter")
-        
-        if footer == nil {
-            footer = DVActionFooter(reuseIdentifier: "DVActionFooter")
-            (footer as? DVActionFooter)?.title = self.cancelButtonTitle
-            (footer as? DVActionFooter)?.label.addTarget(self, action: #selector(self.hide), for: UIControlEvents.touchUpInside)
+        if footerTitle != nil {
+            let footer = tableView.dequeueReusableHeaderFooterView(withIdentifier: "DVActionFooter") as! DVActionFooter
+            footer.titleColor = footerTitleColor
+            footer.title = footerTitle
+            footer.label.addTarget(self, action: #selector(self.hide), for: UIControlEvents.touchUpInside)
+            return footer
         }
-        
-        return footer!
+        return nil
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCell(withIdentifier: "DVActionCell")
-        
-        if cell == nil {
-            cell = DVActionCell(style: UITableViewCellStyle.default, reuseIdentifier: "DVActionCell")
-        }
-        
-        (cell as? DVActionCell)?.title = self.moreButtonTitles[indexPath.row]
-        
-        return cell!
+        let cell = tableView.dequeueReusableCell(withIdentifier: "DVActionCell") as! DVActionCell
+        cell.titleColor = cellTitleColor
+        cell.title = moreButtonTitles[indexPath.row]
+        return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -239,14 +280,18 @@ class DVActionCell: UITableViewCell {
             self.label.text = title
         }
     }
+    var titleColor: UIColor? {
+        didSet {
+            label.textColor = titleColor
+        }
+    }
     var label = UILabel()
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.contentView.backgroundColor = UIColor.white
-        label.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: kActionSheetBtnHeight)
+        label.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: kActionSheetCellHeight)
         label.backgroundColor = UIColor.white
-        label.textColor = kActionSheetTextColor
         label.font = UIFont.systemFont(ofSize: 17)
         label.textAlignment = NSTextAlignment.center
         self.contentView.addSubview(label)
@@ -255,12 +300,12 @@ class DVActionCell: UITableViewCell {
         subLayer.strokeColor = UIColor(red: 224/255.0, green: 224/255.0, blue: 224/255.0, alpha: 1).cgColor
         subLayer.lineWidth = (1 / UIScreen.main.scale)
         let path = UIBezierPath()
-        path.move(to: CGPoint(x: 0-((1 / UIScreen.main.scale) / 2), y: kActionSheetBtnHeight))
-        path.addLine(to: CGPoint(x: UIScreen.main.bounds.width-((1 / UIScreen.main.scale) / 2), y: kActionSheetBtnHeight))
+        path.move(to: CGPoint(x: 0-((1 / UIScreen.main.scale) / 2), y: kActionSheetCellHeight))
+        path.addLine(to: CGPoint(x: UIScreen.main.bounds.width-((1 / UIScreen.main.scale) / 2), y: kActionSheetCellHeight))
         subLayer.path = path.cgPath
         self.contentView.layer.addSublayer(subLayer)
         
-        self.selectedBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: kActionSheetBtnHeight))
+        self.selectedBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: kActionSheetCellHeight))
         self.selectedBackgroundView?.backgroundColor = UIColor(red: 245/255.0, green: 245/255.0, blue: 245/255.0, alpha: 0.9)
     }
     
@@ -271,6 +316,48 @@ class DVActionCell: UITableViewCell {
 }
 
 /*!
+ ActionSheet的Header
+ 
+ @discussion 用来显示标题之类
+ */
+class DVActionHeader: UITableViewHeaderFooterView {
+    var title: String? {
+        didSet {
+            label.text = title
+        }
+    }
+    var titleColor: UIColor? {
+        didSet {
+            label.textColor = titleColor
+        }
+    }
+    var label = UILabel()
+    override init(reuseIdentifier: String?) {
+        super.init(reuseIdentifier: reuseIdentifier)
+        self.contentView.backgroundColor = UIColor.white
+        
+        label = UILabel(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: kActionSheetCellHeight))
+        label.backgroundColor = UIColor.white
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textAlignment = NSTextAlignment.center
+        self.contentView.addSubview(label)
+        
+        let subLayer = CAShapeLayer()
+        subLayer.strokeColor = UIColor(red: 224/255.0, green: 224/255.0, blue: 224/255.0, alpha: 1).cgColor
+        subLayer.lineWidth = (1 / UIScreen.main.scale)
+        let path = UIBezierPath()
+        path.move(to: CGPoint(x: 0-((1 / UIScreen.main.scale) / 2), y: kActionSheetCellHeight))
+        path.addLine(to: CGPoint(x: UIScreen.main.bounds.width-((1 / UIScreen.main.scale) / 2), y: kActionSheetCellHeight))
+        subLayer.path = path.cgPath
+        self.contentView.layer.addSublayer(subLayer)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+/*!
  ActionSheet的Footer
  
  @discussion 用来显示取消之类的操作
@@ -278,7 +365,12 @@ class DVActionCell: UITableViewCell {
 class DVActionFooter: UITableViewHeaderFooterView {
     var title: String? {
         didSet {
-            self.label.setTitle(title, for: UIControlState.normal)
+            label.setTitle(title, for: UIControlState.normal)
+        }
+    }
+    var titleColor: UIColor? {
+        didSet {
+            label.setTitleColor(titleColor, for: UIControlState.normal)
         }
     }
     var label = UIButton()
@@ -291,10 +383,9 @@ class DVActionFooter: UITableViewHeaderFooterView {
         subLayer.backgroundColor = UIColor(red: 231/255.0, green: 231/255.0, blue: 231/255.0, alpha: 0.9).cgColor
         self.contentView.layer.addSublayer(subLayer)
         
-        label.frame = CGRect(x: 0, y: 3, width: UIScreen.main.bounds.width, height: kActionSheetBtnHeight)
+        label.frame = CGRect(x: 0, y: 3, width: UIScreen.main.bounds.width, height: kActionSheetCellHeight)
         label.backgroundColor = UIColor.white
         label.setBackgroundImage(UIImage.ImageFromColor(UIColor(red: 245/255.0, green: 245/255.0, blue: 245/255.0, alpha: 0.9), frame: label.bounds), for: UIControlState.highlighted)
-        label.setTitleColor(kActionSheetTextColor, for: UIControlState.normal)
         label.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         label.titleLabel?.textAlignment = NSTextAlignment.center
         self.contentView.addSubview(label)
