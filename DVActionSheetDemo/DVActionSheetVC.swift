@@ -6,7 +6,7 @@
 //  Copyright © 2017年 david. All rights reserved.
 //
 
-protocol DVActionSheetVCDelegate {
+public protocol DVActionSheetVCDelegate {
     func dvActionSheetVC(_ actionSheetVC: DVActionSheetVC, clickedButtonAt buttonIndex: Int)
 }
 
@@ -19,9 +19,9 @@ let kActionSheetTextColor = UIColor(red: 51/255.0, green: 51/255.0, blue: 51/255
 //  actionBtn高度
 let kActionSheetCellHeight: CGFloat = 55
 
-class DVActionSheetVC: UIViewController {
+public class DVActionSheetVC: UIViewController {
     
-    var delegate: DVActionSheetVCDelegate?
+    public var delegate: DVActionSheetVCDelegate?
     lazy var actionSheet: UITableView! = {
         let table = UITableView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
         self.view.addSubview(table)
@@ -42,57 +42,57 @@ class DVActionSheetVC: UIViewController {
      
      @discussion 可使用代理或者block，若实现了block将不会执行代理
      */
-    var finishSelect: ((Int)->Void)?
+    public var finishSelect: ((Int)->Void)?
     
-    var headerTitleColor: UIColor = UIColor.lightGray {
+    public var headerTitleColor: UIColor = UIColor.lightGray {
         didSet {
             reloadActionSheet()
         }
     }
-    var cellTitleColor: UIColor = kActionSheetTextColor {
+    public var cellTitleColor: UIColor = kActionSheetTextColor {
         didSet {
             reloadActionSheet()
         }
     }
-    var footerTitleColor: UIColor = kActionSheetTextColor {
+    public var footerTitleColor: UIColor = kActionSheetTextColor {
         didSet {
             reloadActionSheet()
         }
     }
     /// 取消按钮的title，默认为取消
-    var footerTitle: String? {
+    public var footerTitle: String? {
         didSet {
             reloadActionSheet()
         }
     }
     /// 标题按钮的title
-    var headerTitle: String? {
+    public var headerTitle: String? {
         didSet {
             reloadActionSheet()
         }
     }
     /// actionSheet的标题集合
-    var moreButtonTitles: [String] = [] {
+    public var moreButtonTitles: [String] = [] {
         didSet {
             reloadActionSheet()
         }
     }
     
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         
         // Do any additional setup after loading the view.
         self.setView()
     }
     
-    override func didReceiveMemoryWarning() {
+    override public func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
     func setView() {
         self.view.backgroundColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 0/255.0, alpha: 0.6)
-        self.modalPresentationStyle = UIModalPresentationStyle.custom
+        self.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
         self.transitioningDelegate = self
     }
     
@@ -119,7 +119,7 @@ class DVActionSheetVC: UIViewController {
         actionSheet.reloadData()
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -130,27 +130,27 @@ class DVActionSheetVC: UIViewController {
 }
 
 extension DVActionSheetVC: UITableViewDelegate, UITableViewDataSource {
-    func numberOfSections(in tableView: UITableView) -> Int {
+    public func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return moreButtonTitles.count
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return headerTitle != nil ? kActionSheetCellHeight : 0
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return kActionSheetCellHeight
     }
     
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return footerTitle != nil ? (kActionSheetCellHeight + 3) : 0
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if headerTitle != nil {
             let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "DVActionHeader") as! DVActionHeader
             header.titleColor = headerTitleColor
@@ -160,7 +160,7 @@ extension DVActionSheetVC: UITableViewDelegate, UITableViewDataSource {
         return nil
     }
     
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         if footerTitle != nil {
             let footer = tableView.dequeueReusableHeaderFooterView(withIdentifier: "DVActionFooter") as! DVActionFooter
             footer.titleColor = footerTitleColor
@@ -171,14 +171,14 @@ extension DVActionSheetVC: UITableViewDelegate, UITableViewDataSource {
         return nil
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "DVActionCell") as! DVActionCell
         cell.titleColor = cellTitleColor
         cell.title = moreButtonTitles[indexPath.row]
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         self.dismiss(animated: true) {
             if self.finishSelect != nil {
                 self.finishSelect?(indexPath.row)
@@ -197,11 +197,11 @@ enum DVPresentAnimatorType {
 
 ///转场动画代理
 extension DVActionSheetVC: UIViewControllerTransitioningDelegate {
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return actionSheetVCPresentAnimator(withType: DVPresentAnimatorType.present)
     }
     
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return actionSheetVCPresentAnimator(withType: DVPresentAnimatorType.dismiss)
     }
 }
