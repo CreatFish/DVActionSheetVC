@@ -20,7 +20,7 @@ let kActionSheetTextColor = UIColor(red: 51/255.0, green: 51/255.0, blue: 51/255
 let kActionSheetCellHeight: CGFloat = 55
 
 class DVActionSheetVC: UIViewController {
-
+    
     var delegate: DVActionSheetVCDelegate?
     lazy var actionSheet: UITableView! = {
         let table = UITableView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
@@ -30,7 +30,7 @@ class DVActionSheetVC: UIViewController {
         table.delegate = self
         table.dataSource = self
         table.bounces = false
-        table.separatorStyle = UITableViewCellSeparatorStyle.none
+        table.separatorStyle = UITableViewCell.SeparatorStyle.none
         table.register(DVActionCell.classForCoder(), forCellReuseIdentifier: "DVActionCell")
         table.register(DVActionFooter.classForCoder(), forHeaderFooterViewReuseIdentifier: "DVActionFooter")
         table.register(DVActionHeader.classForCoder(), forHeaderFooterViewReuseIdentifier: "DVActionHeader")
@@ -42,7 +42,7 @@ class DVActionSheetVC: UIViewController {
      
      @discussion 可使用代理或者block，若实现了block将不会执行代理
      */
-    var finishSelect: ((UInt32)->Void)?
+    var finishSelect: ((Int)->Void)?
     
     var headerTitleColor: UIColor = UIColor.lightGray {
         didSet {
@@ -80,11 +80,11 @@ class DVActionSheetVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Do any additional setup after loading the view.
         self.setView()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -107,6 +107,10 @@ class DVActionSheetVC: UIViewController {
         height = height + (footerTitle != nil ? kActionSheetCellHeight + 3 : 0)
         height = height + kActionSheetCellHeight*CGFloat(moreButtonTitles.count)
         let maxHeight: CGFloat = (UIScreen.main.bounds.height == 812) ? (UIScreen.main.bounds.height - 44) : (UIScreen.main.bounds.height - 20)
+        //  适配一下iphoneX
+        if UIScreen.main.bounds.height == 812 {
+            height += 83 - 49
+        }
         if height > maxHeight {
             height = maxHeight
         }
@@ -122,7 +126,7 @@ class DVActionSheetVC: UIViewController {
     @objc private func hide() {
         self.dismiss(animated: true, completion: nil)
     }
-
+    
 }
 
 extension DVActionSheetVC: UITableViewDelegate, UITableViewDataSource {
@@ -161,7 +165,7 @@ extension DVActionSheetVC: UITableViewDelegate, UITableViewDataSource {
             let footer = tableView.dequeueReusableHeaderFooterView(withIdentifier: "DVActionFooter") as! DVActionFooter
             footer.titleColor = footerTitleColor
             footer.title = footerTitle
-            footer.label.addTarget(self, action: #selector(self.hide), for: UIControlEvents.touchUpInside)
+            footer.label.addTarget(self, action: #selector(self.hide), for:UIControl.Event.touchUpInside)
             return footer
         }
         return nil
@@ -177,7 +181,7 @@ extension DVActionSheetVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         self.dismiss(animated: true) {
             if self.finishSelect != nil {
-                self.finishSelect?(UInt32(indexPath.row))
+                self.finishSelect?(indexPath.row)
             } else {
                 self.delegate?.dvActionSheetVC(self, clickedButtonAt: indexPath.row)
             }
@@ -287,13 +291,14 @@ class DVActionCell: UITableViewCell {
     }
     var label = UILabel()
     
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.contentView.backgroundColor = UIColor.white
         label.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: kActionSheetCellHeight)
         label.backgroundColor = UIColor.white
         label.font = UIFont.systemFont(ofSize: 17)
         label.textAlignment = NSTextAlignment.center
+        label.adjustsFontSizeToFitWidth = true
         self.contentView.addSubview(label)
         
         let subLayer = CAShapeLayer()
@@ -365,12 +370,12 @@ class DVActionHeader: UITableViewHeaderFooterView {
 class DVActionFooter: UITableViewHeaderFooterView {
     var title: String? {
         didSet {
-            label.setTitle(title, for: UIControlState.normal)
+            label.setTitle(title, for: UIControl.State.normal)
         }
     }
     var titleColor: UIColor? {
         didSet {
-            label.setTitleColor(titleColor, for: UIControlState.normal)
+            label.setTitleColor(titleColor, for: UIControl.State.normal)
         }
     }
     var label = UIButton()
@@ -385,7 +390,7 @@ class DVActionFooter: UITableViewHeaderFooterView {
         
         label.frame = CGRect(x: 0, y: 3, width: UIScreen.main.bounds.width, height: kActionSheetCellHeight)
         label.backgroundColor = UIColor.white
-        label.setBackgroundImage(UIImage.ImageFromColor(UIColor(red: 245/255.0, green: 245/255.0, blue: 245/255.0, alpha: 0.9), frame: label.bounds), for: UIControlState.highlighted)
+        label.setBackgroundImage(UIImage.ImageFromColor(UIColor(red: 245/255.0, green: 245/255.0, blue: 245/255.0, alpha: 0.9), frame: label.bounds), for: UIControl.State.highlighted)
         label.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         label.titleLabel?.textAlignment = NSTextAlignment.center
         self.contentView.addSubview(label)
